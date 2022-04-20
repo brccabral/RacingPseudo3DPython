@@ -1,4 +1,5 @@
 import time
+from typing import List
 import pygame
 import sys
 
@@ -9,6 +10,13 @@ roadW = 2000  # road width (left to right)
 segL = 200  # segment length (top to bottom)
 camD = 0.84  # camera depth
 
+dark_grass = pygame.Color(0, 154, 0)
+light_grass = pygame.Color(16, 200, 16)
+white_rumble = pygame.Color(255, 255, 255)
+black_rumble = pygame.Color(0, 0, 0)
+dark_road = pygame.Color(105, 105, 105)
+light_road = pygame.Color(107, 107, 107)
+
 
 class Line:
     def __init__(self):
@@ -17,9 +25,11 @@ class Line:
         self.scale = 0.0  # scale from camera position
 
     def project(self, camX: int, camY: int, camZ: int):
+        if not self.z:
+            return
         self.scale = camD / (self.z - camZ)
-        self.X = (1 + self.scale * (self.x - self.camX)) * WINDOW_WIDTH / 2
-        self.Y = (1 - self.scale * (self.y - self.camY)) * WINDOW_HEIGHT / 2
+        self.X = (1 + self.scale * (self.x - camX)) * WINDOW_WIDTH / 2
+        self.Y = (1 - self.scale * (self.y - camY)) * WINDOW_HEIGHT / 2
         self.W = self.scale * roadW * WINDOW_WIDTH / 2
 
 
@@ -48,9 +58,19 @@ class GameWindow:
         self.dt = 0
 
     def run(self):
-        self.dt = time.time() - self.last_time
-        self.last_time = time.time()
+
+        # create road lines for each segment
+        lines: List[Line] = []
+        for i in range(1600):
+            line = Line()
+            line.z = i * segL
+            lines.append(line)
+
+        N = len(lines)
+
         while True:
+            self.dt = time.time() - self.last_time
+            self.last_time = time.time()
             self.window_surface.fill("black")
 
             for event in pygame.event.get([pygame.QUIT]):
@@ -58,9 +78,51 @@ class GameWindow:
                     pygame.quit()
                     sys.exit()
 
-            drawQuad(self.window_surface, "green", 500, 500, 200, 500, 300, 100)
+            # draw road
+            for n in range(300):
+                current = lines[n % N]
+                current.project(0, 1500, 0)
+
+                prev = lines[(n - 1) % N]  # previous line
+
+                # change color at every other 3 lines (int floor division)
+                grass_color = light_grass if (n // 3) % 2 else dark_grass
+                rumble_color = white_rumble if (n // 3) % 2 else black_rumble
+                road_color = light_road if (n // 3) % 2 else dark_road
+
+                drawQuad(
+                    self.window_surface,
+                    grass_color,
+                    0,
+                    prev.Y,
+                    WINDOW_WIDTH,
+                    0,
+                    current.Y,
+                    WINDOW_WIDTH,
+                )
+                drawQuad(
+                    self.window_surface,
+                    rumble_color,
+                    prev.X,
+                    prev.Y,
+                    prev.W * 1.2,
+                    current.X,
+                    current.Y,
+                    current.W * 1.2,
+                )
+                drawQuad(
+                    self.window_surface,
+                    road_color,
+                    prev.X,
+                    prev.Y,
+                    prev.W,
+                    current.X,
+                    current.Y,
+                    current.W,
+                )
 
             pygame.display.flip()
+            self.clock.tick(60)
 
 
 if __name__ == "__main__":
