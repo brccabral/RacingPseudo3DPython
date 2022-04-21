@@ -30,6 +30,10 @@ class Line:
         self.sprite: pygame.Surface = None
         self.sprite_rect: pygame.Rect = None
 
+        self.grass_color: pygame.Color = "black"
+        self.rumble_color: pygame.Color = "black"
+        self.road_color: pygame.Color = "black"
+
     def project(self, camX: int, camY: int, camZ: int):
         if not self.z:
             return
@@ -110,6 +114,15 @@ class GameWindow:
             line = Line()
             line.z = i * segL
 
+            # change color at every other 3 lines (int floor division)
+            grass_color = light_grass if (i // 3) % 2 else dark_grass
+            rumble_color = white_rumble if (i // 3) % 2 else black_rumble
+            road_color = light_road if (i // 3) % 2 else dark_road
+
+            line.grass_color = grass_color
+            line.rumble_color = rumble_color
+            line.road_color = road_color
+
             if 300 < i < 700:
                 line.curve = 0.5
 
@@ -176,14 +189,9 @@ class GameWindow:
 
                 prev = lines[(n - 1) % N]  # previous line
 
-                # change color at every other 3 lines (int floor division)
-                grass_color = light_grass if (n // 3) % 2 else dark_grass
-                rumble_color = white_rumble if (n // 3) % 2 else black_rumble
-                road_color = light_road if (n // 3) % 2 else dark_road
-
                 drawQuad(
                     self.window_surface,
-                    grass_color,
+                    current.grass_color,
                     0,
                     prev.Y,
                     WINDOW_WIDTH,
@@ -193,7 +201,7 @@ class GameWindow:
                 )
                 drawQuad(
                     self.window_surface,
-                    rumble_color,
+                    current.rumble_color,
                     prev.X,
                     prev.Y,
                     prev.W * 1.2,
@@ -203,7 +211,7 @@ class GameWindow:
                 )
                 drawQuad(
                     self.window_surface,
-                    road_color,
+                    current.road_color,
                     prev.X,
                     prev.Y,
                     prev.W,
