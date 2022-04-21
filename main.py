@@ -167,6 +167,7 @@ class GameWindow:
         N = len(lines)
         pos = 0
         playerX = 0
+        playerY = 1500
 
         while True:
             self.dt = time.time() - self.last_time
@@ -188,6 +189,10 @@ class GameWindow:
                 playerX += 200
             if keys[pygame.K_LEFT]:
                 playerX -= 200
+            if keys[pygame.K_w]:
+                playerY += 100
+            if keys[pygame.K_s]:
+                playerY -= 100
 
             # loop the circut from start to finish
             while pos >= N * segL:
@@ -198,7 +203,7 @@ class GameWindow:
 
             x = dx = 0.0  # curve offset on x axis
 
-            camH = 1500 + lines[startPos].y
+            camH = 1500 + lines[startPos].y + playerY
             maxy = WINDOW_HEIGHT
 
             # draw road
