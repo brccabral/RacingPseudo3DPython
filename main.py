@@ -27,6 +27,8 @@ class Line:
     def project(self, camX: int, camY: int, camZ: int):
         if not self.z:
             return
+        if not self.z - camZ:
+            return
         self.scale = camD / (self.z - camZ)
         self.X = (1 + self.scale * (self.x - camX)) * WINDOW_WIDTH / 2
         self.Y = (1 - self.scale * (self.y - camY)) * WINDOW_HEIGHT / 2
@@ -67,6 +69,7 @@ class GameWindow:
             lines.append(line)
 
         N = len(lines)
+        pos = 0
 
         while True:
             self.dt = time.time() - self.last_time
@@ -78,10 +81,17 @@ class GameWindow:
                     pygame.quit()
                     sys.exit()
 
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_UP]:
+                pos += 200
+            if keys[pygame.K_DOWN]:
+                pos -= 200
+            startPos = pos // segL
+
             # draw road
-            for n in range(300):
+            for n in range(startPos, startPos + 300):
                 current = lines[n % N]
-                current.project(0, 1500, 0)
+                current.project(0, 1500, pos)
 
                 prev = lines[(n - 1) % N]  # previous line
 
