@@ -166,8 +166,8 @@ class GameWindow:
 
         N = len(lines)
         pos = 0
-        playerX = 0
-        playerY = 1500
+        playerX = 0  # player start at the center of the road
+        playerY = 1500  # camera height offset
 
         while True:
             self.dt = time.time() - self.last_time
@@ -208,7 +208,7 @@ class GameWindow:
 
             x = dx = 0.0  # curve offset on x axis
 
-            camH = 1500 + lines[startPos].y + playerY
+            camH = lines[startPos].y + playerY
             maxy = WINDOW_HEIGHT
 
             # draw road
