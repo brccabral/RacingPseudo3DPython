@@ -62,6 +62,10 @@ class Line:
             clipH = 0
         if clipH >= destH:
             return
+
+        # avoid scalling up images which causes lag
+        if destW > w:
+            return
         # TODO : mask the sprite if below ground
         scaled_sprite = pygame.transform.scale(self.sprite, (destW, destH))
         draw_surface.blit(scaled_sprite, (destX, destY))
@@ -224,7 +228,7 @@ class GameWindow:
             for n in range(startPos + 300, startPos, -1):
                 lines[n % N].drawSprite(self.window_surface)
 
-            pygame.display.flip()
+            pygame.display.update()
             self.clock.tick(60)
 
 
