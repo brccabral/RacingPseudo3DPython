@@ -108,7 +108,9 @@ class GameWindow:
         self.window_surface.blit(self.background_surface, self.background_rect)
 
         # sprites
-        self.sprite_5 = pygame.image.load("images/5.png").convert_alpha()
+        self.sprites: List[pygame.Surface] = []
+        for i in range(1, 8):
+            self.sprites.append(pygame.image.load(f"images/{i}.png").convert_alpha())
 
     def run(self):
 
@@ -133,9 +135,26 @@ class GameWindow:
             if i > 750:
                 line.y = math.sin(i / 30.0) * 1500
 
-            if i % 20 == 0:
+            # Sprites segments
+            if i < 300 and i % 20 == 0:
                 line.spriteX = -2.5
-                line.sprite = self.sprite_5
+                line.sprite = self.sprites[4]
+
+            if i % 17 == 0:
+                line.spriteX = 2.0
+                line.sprite = self.sprites[5]
+
+            if i > 300 and i % 20 == 0:
+                line.spriteX = -0.7
+                line.sprite = self.sprites[3]
+
+            if i > 800 and i % 20 == 0:
+                line.spriteX = -1.2
+                line.sprite = self.sprites[0]
+
+            if i == 400:
+                line.spriteX = -1.2
+                line.sprite = self.sprites[6]
 
             lines.append(line)
 
