@@ -129,11 +129,17 @@ class GameWindow:
             line.rumble_color = rumble_color
             line.road_color = road_color
 
+            # right curve
             if 300 < i < 700:
                 line.curve = 0.5
 
+            # uphill and downhill
             if i > 750:
                 line.y = math.sin(i / 30.0) * 1500
+
+            # left curve
+            if i > 1100:
+                line.curve = -0.7
 
             # Sprites segments
             if i < 300 and i % 20 == 0:
