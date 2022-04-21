@@ -70,6 +70,7 @@ class GameWindow:
 
         N = len(lines)
         pos = 0
+        playerX = 0
 
         while True:
             self.dt = time.time() - self.last_time
@@ -86,12 +87,16 @@ class GameWindow:
                 pos += 200
             if keys[pygame.K_DOWN]:
                 pos -= 200
+            if keys[pygame.K_RIGHT]:
+                playerX += 200
+            if keys[pygame.K_LEFT]:
+                playerX -= 200
             startPos = pos // segL
 
             # draw road
             for n in range(startPos, startPos + 300):
                 current = lines[n % N]
-                current.project(0, 1500, pos)
+                current.project(playerX, 1500, pos)
 
                 prev = lines[(n - 1) % N]  # previous line
 
