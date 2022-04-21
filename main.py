@@ -180,11 +180,12 @@ class GameWindow:
                     pygame.quit()
                     sys.exit()
 
+            speed = 0
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP]:
-                pos += 200
+                speed += segL  # it has to be N integer times the segment length
             if keys[pygame.K_DOWN]:
-                pos -= 200
+                speed -= segL  # it has to be N integer times the segment length
             if keys[pygame.K_RIGHT]:
                 playerX += 200
             if keys[pygame.K_LEFT]:
@@ -193,6 +194,10 @@ class GameWindow:
                 playerY += 100
             if keys[pygame.K_s]:
                 playerY -= 100
+            # turbo speed
+            if keys[pygame.K_TAB]:
+                speed *= 2  # it has to be N integer times the segment length
+            pos += speed
 
             # loop the circut from start to finish
             while pos >= N * segL:
