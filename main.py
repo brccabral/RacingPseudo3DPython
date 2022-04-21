@@ -1,3 +1,4 @@
+import math
 import time
 from typing import List
 import pygame
@@ -71,6 +72,9 @@ class GameWindow:
             if 300 < i < 700:
                 line.curve = 0.5
 
+            if i > 750:
+                line.y = math.sin(i / 30.0) * 1500
+
             lines.append(line)
 
         N = len(lines)
@@ -100,12 +104,20 @@ class GameWindow:
 
             x = dx = 0.0  # curve offset on x axis
 
+            camH = 1500 + lines[startPos].y
+            maxy = WINDOW_HEIGHT
+
             # draw road
             for n in range(startPos, startPos + 300):
                 current = lines[n % N]
-                current.project(playerX - x, 1500, pos)
+                current.project(playerX - x, camH, pos)
                 x += dx
                 dx += current.curve
+
+                # don't draw "above ground"
+                if current.Y >= maxy:
+                    continue
+                maxy = current.Y
 
                 prev = lines[(n - 1) % N]  # previous line
 
