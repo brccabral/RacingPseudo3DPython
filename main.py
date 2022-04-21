@@ -100,6 +100,12 @@ class GameWindow:
                 playerX += 200
             if keys[pygame.K_LEFT]:
                 playerX -= 200
+
+            # loop the circut from start to finish
+            while pos >= N * segL:
+                pos -= N * segL
+            while pos < 0:
+                pos += N * segL
             startPos = pos // segL
 
             x = dx = 0.0  # curve offset on x axis
@@ -110,7 +116,8 @@ class GameWindow:
             # draw road
             for n in range(startPos, startPos + 300):
                 current = lines[n % N]
-                current.project(playerX - x, camH, pos)
+                # loop the circut from start to finish = pos - (N * segL if n >= N else 0)
+                current.project(playerX - x, camH, pos - (N * segL if n >= N else 0))
                 x += dx
                 dx += current.curve
 
