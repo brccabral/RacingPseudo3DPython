@@ -23,6 +23,7 @@ class Line:
         self.x = self.y = self.z = 0.0  # game position (3D space)
         self.X = self.Y = self.W = 0.0  # game position (2D projection)
         self.scale = 0.0  # scale from camera position
+        self.curve = 0.0  # curve radius
 
     def project(self, camX: int, camY: int, camZ: int):
         if not self.z:
@@ -66,6 +67,10 @@ class GameWindow:
         for i in range(1600):
             line = Line()
             line.z = i * segL
+
+            if 300 < i < 700:
+                line.curve = 0.5
+
             lines.append(line)
 
         N = len(lines)
@@ -93,10 +98,14 @@ class GameWindow:
                 playerX -= 200
             startPos = pos // segL
 
+            x = dx = 0.0  # curve offset on x axis
+
             # draw road
             for n in range(startPos, startPos + 300):
                 current = lines[n % N]
-                current.project(playerX, 1500, pos)
+                current.project(playerX - x, 1500, pos)
+                x += dx
+                dx += current.curve
 
                 prev = lines[(n - 1) % N]  # previous line
 
@@ -137,7 +146,7 @@ class GameWindow:
                 )
 
             pygame.display.flip()
-            self.clock.tick(60)
+            # self.clock.tick(60)
 
 
 if __name__ == "__main__":
