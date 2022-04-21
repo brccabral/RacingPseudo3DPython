@@ -25,6 +25,10 @@ class Line:
         self.X = self.Y = self.W = 0.0  # game position (2D projection)
         self.scale = 0.0  # scale from camera position
         self.curve = 0.0  # curve radius
+        self.spriteX = 0.0  # sprite position X
+        self.clip = 0.0  # correct sprite Y position
+        self.sprite: pygame.Surface = None
+        self.sprite_rect: pygame.Rect = None
 
     def project(self, camX: int, camY: int, camZ: int):
         if not self.z:
@@ -35,6 +39,28 @@ class Line:
         self.X = (1 + self.scale * (self.x - camX)) * WINDOW_WIDTH / 2
         self.Y = (1 - self.scale * (self.y - camY)) * WINDOW_HEIGHT / 2
         self.W = self.scale * roadW * WINDOW_WIDTH / 2
+
+    def drawSprite(self, draw_surface: pygame.Surface):
+        if self.sprite is None:
+            return
+        w = self.sprite.get_width()
+        h = self.sprite.get_height()
+        destX = self.X + self.scale * self.spriteX * WINDOW_WIDTH / 2
+        destY = self.Y + 4
+        destW = w * self.W / 266
+        destH = h * self.W / 266
+
+        destX += destW * self.spriteX
+        destY += destH * -1
+
+        clipH = destY + destH - self.clip
+        if clipH < 0:
+            clipH = 0
+        if clipH >= destH:
+            return
+        # TODO : mask the sprite if below ground
+        scaled_sprite = pygame.transform.scale(self.sprite, (destW, destH))
+        draw_surface.blit(scaled_sprite, (destX, destY))
 
 
 def drawQuad(
@@ -73,6 +99,9 @@ class GameWindow:
         self.background_rect = self.background_surface.get_rect(topleft=(0, 0))
         self.window_surface.blit(self.background_surface, self.background_rect)
 
+        # sprites
+        self.sprite_5 = pygame.image.load("images/5.png").convert_alpha()
+
     def run(self):
 
         # create road lines for each segment
@@ -86,6 +115,10 @@ class GameWindow:
 
             if i > 750:
                 line.y = math.sin(i / 30.0) * 1500
+
+            if i % 20 == 0:
+                line.spriteX = -2.5
+                line.sprite = self.sprite_5
 
             lines.append(line)
 
@@ -134,6 +167,8 @@ class GameWindow:
                 x += dx
                 dx += current.curve
 
+                current.clip = maxy
+
                 # don't draw "above ground"
                 if current.Y >= maxy:
                     continue
@@ -177,8 +212,12 @@ class GameWindow:
                     current.W,
                 )
 
+            # draw sprites
+            for n in range(startPos + 300, startPos, -1):
+                lines[n % N].drawSprite(self.window_surface)
+
             pygame.display.flip()
-            # self.clock.tick(60)
+            self.clock.tick(60)
 
 
 if __name__ == "__main__":
