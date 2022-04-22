@@ -64,9 +64,12 @@ class Line:
         # avoid scalling up images which causes lag
         if destW > w:
             return
-        # TODO : mask the sprite if below ground
+
+        # mask the sprite if below ground (clipH)
         scaled_sprite = pygame.transform.scale(self.sprite, (destW, destH))
-        draw_surface.blit(scaled_sprite, (destX, destY))
+        crop_surface = scaled_sprite.subsurface(0, 0, destW, destH - clipH)
+
+        draw_surface.blit(crop_surface, (destX, destY))
 
 
 def drawQuad(
