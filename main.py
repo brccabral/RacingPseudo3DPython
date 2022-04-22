@@ -201,6 +201,9 @@ class GameWindow:
                 playerY += 100
             if keys[pygame.K_s]:
                 playerY -= 100
+            # avoid camera going below ground
+            if playerY < 500:
+                playerY = 500
             # turbo speed
             if keys[pygame.K_TAB]:
                 speed *= 2  # it has to be N integer times the segment length
