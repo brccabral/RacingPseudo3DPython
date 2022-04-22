@@ -95,15 +95,21 @@ class GameWindow:
 
         # background
         self.background_image = pygame.image.load("images/bg.png").convert_alpha()
+        self.background_image = pygame.transform.scale(
+            self.background_image, (WINDOW_WIDTH, self.background_image.get_height())
+        )
         self.background_surface = pygame.Surface(
-            (self.background_image.get_width() * 2, self.background_image.get_height())
+            (self.background_image.get_width() * 3, self.background_image.get_height())
         )
         self.background_surface.blit(self.background_image, (0, 0))
         self.background_surface.blit(
             self.background_image, (self.background_image.get_width(), 0)
         )
+        self.background_surface.blit(
+            self.background_image, (self.background_image.get_width() * 2, 0)
+        )
         self.background_rect = self.background_surface.get_rect(
-            topleft=(-self.background_image.get_width() // 3, 0)
+            topleft=(-self.background_image.get_width(), 0)
         )
         self.window_surface.blit(self.background_surface, self.background_rect)
 
@@ -216,6 +222,12 @@ class GameWindow:
                 self.background_rect.x -= lines[startPos].curve * 2
             elif speed < 0:
                 self.background_rect.x += lines[startPos].curve * 2
+
+            if self.background_rect.right < WINDOW_WIDTH:
+                self.background_rect.x = -WINDOW_WIDTH
+            elif self.background_rect.left > 0:
+                self.background_rect.x = -WINDOW_WIDTH
+
             self.window_surface.blit(self.background_surface, self.background_rect)
 
             # draw road
