@@ -104,7 +104,9 @@ class GameWindow:
         self.background_surface.blit(
             self.background_image, (self.background_image.get_width(), 0)
         )
-        self.background_rect = self.background_surface.get_rect(topleft=(0, 0))
+        self.background_rect = self.background_surface.get_rect(
+            topleft=(-self.background_image.get_width() // 3, 0)
+        )
         self.window_surface.blit(self.background_surface, self.background_rect)
 
         # sprites
@@ -173,7 +175,6 @@ class GameWindow:
             self.dt = time.time() - self.last_time
             self.last_time = time.time()
             self.window_surface.fill("black")
-            self.window_surface.blit(self.background_surface, self.background_rect)
 
             for event in pygame.event.get([pygame.QUIT]):
                 if event.type == pygame.QUIT:
@@ -210,6 +211,12 @@ class GameWindow:
 
             camH = lines[startPos].y + playerY
             maxy = WINDOW_HEIGHT
+
+            if speed > 0:
+                self.background_rect.x -= lines[startPos].curve * 2
+            elif speed < 0:
+                self.background_rect.x += lines[startPos].curve * 2
+            self.window_surface.blit(self.background_surface, self.background_rect)
 
             # draw road
             for n in range(startPos, startPos + 300):
