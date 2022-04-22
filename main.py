@@ -174,7 +174,7 @@ class GameWindow:
         while True:
             self.dt = time.time() - self.last_time
             self.last_time = time.time()
-            self.window_surface.fill("black")
+            self.window_surface.fill((105, 205, 4))
 
             for event in pygame.event.get([pygame.QUIT]):
                 if event.type == pygame.QUIT:
