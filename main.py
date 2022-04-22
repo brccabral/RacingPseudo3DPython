@@ -10,6 +10,7 @@ WINDOW_HEIGHT = 768
 roadW = 2000  # road width (left to right)
 segL = 200  # segment length (top to bottom)
 camD = 0.84  # camera depth
+show_N_seg = 300
 
 dark_grass = pygame.Color(0, 154, 0)
 light_grass = pygame.Color(16, 200, 16)
@@ -20,7 +21,8 @@ light_road = pygame.Color(107, 107, 107)
 
 
 class Line:
-    def __init__(self):
+    def __init__(self, i):
+        self.i = i
         self.x = self.y = self.z = 0.0  # game position (3D space)
         self.X = self.Y = self.W = 0.0  # game position (2D projection)
         self.scale = 0.0  # scale from camera position
@@ -35,10 +37,6 @@ class Line:
         self.road_color: pygame.Color = "black"
 
     def project(self, camX: int, camY: int, camZ: int):
-        if not self.z:
-            return
-        if not self.z - camZ:
-            return
         self.scale = camD / (self.z - camZ)
         self.X = (1 + self.scale * (self.x - camX)) * WINDOW_WIDTH / 2
         self.Y = (1 - self.scale * (self.y - camY)) * WINDOW_HEIGHT / 2
@@ -119,8 +117,10 @@ class GameWindow:
         # create road lines for each segment
         lines: List[Line] = []
         for i in range(1600):
-            line = Line()
-            line.z = i * segL
+            line = Line(i)
+            line.z = (
+                i * segL + 0.00001
+            )  # adding a small value avoids Line.project() errors
 
             # change color at every other 3 lines (int floor division)
             grass_color = light_grass if (i // 3) % 2 else dark_grass
@@ -219,7 +219,7 @@ class GameWindow:
             self.window_surface.blit(self.background_surface, self.background_rect)
 
             # draw road
-            for n in range(startPos, startPos + 300):
+            for n in range(startPos, startPos + show_N_seg):
                 current = lines[n % N]
                 # loop the circut from start to finish = pos - (N * segL if n >= N else 0)
                 current.project(playerX - x, camH, pos - (N * segL if n >= N else 0))
@@ -267,7 +267,7 @@ class GameWindow:
                 )
 
             # draw sprites
-            for n in range(startPos + 300, startPos, -1):
+            for n in range(startPos + show_N_seg, startPos + 1, -1):
                 lines[n % N].drawSprite(self.window_surface)
 
             pygame.display.update()
